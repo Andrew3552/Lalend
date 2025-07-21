@@ -331,9 +331,9 @@ function Main() {
                   showAnswers && (
                     <div className="answers">
                       {questions[step].answers.map((text, i) => (
-                        <button key={i} onClick={handleAnswer}>
+                        <Button key={i} onClick={handleAnswer}>
                           {text}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   )

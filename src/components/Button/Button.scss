@@ -1,0 +1,43 @@
+// src/components/NeonButton/NeonButton.scss
+.neon-button {
+  padding: 0.75em 2em;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  background-color: #151d7a; // тёмно-синий фон
+  border-radius: 8px;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); // лёгкое свечение по умолчанию
+}
+
+.neon-button::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 10px;
+  background: linear-gradient(45deg, #FFD700, #FFF176); // неоновый контур
+  z-index: -1;
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.neon-button:hover::before {
+  opacity: 1;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    filter: blur(6px);
+  }
+  to {
+    filter: blur(12px);
+  }
+}

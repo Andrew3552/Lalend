@@ -65,22 +65,24 @@
 .neon-button::before {
   content: "";
   position: absolute;
-  top: -4px;
-  left: -4px;
-  right: -4px;
-  bottom: -4px;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
   border-radius: 10px;
   background: linear-gradient(45deg, #FFD700, #FFF176); // неон контур
   z-index: -1;
   filter: blur(8px);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
-}
-
-.neon-button:hover::before {
   opacity: 1;
   animation: pulse 1s infinite alternate;
 }
+
+// .neon-button:hover::before {
+//   opacity: 1;
+//   animation: pulse 1s infinite alternate;
+// }
 
 @keyframes pulse {
   from {

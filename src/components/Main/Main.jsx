@@ -179,7 +179,6 @@
 
 // export default Main;
 
-
 import { useState, useEffect } from "react";
 import questions from "./questions";
 import speakTexts from "./speakTexts";
@@ -187,6 +186,7 @@ import { intermediateText1, intermediateText2, introText } from "./Text";
 import { fetchSpeech } from "../../api/elevenLabs";
 import AudioSphereVisualizer from "../AudioSphereVisualizer/AudioSphereVisualizer";
 import Button from "../Button/Button";
+import RegistrationForm from "../Form/RegistrationForm";
 import Loading from "../Loading/Loading";
 import "./Main.scss";
 
@@ -198,6 +198,7 @@ function Main() {
   const [volume, setVolume] = useState(0);
   const [isTypingDone, setIsTypingDone] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
 
   useEffect(() => {
     if (step >= questions.length || step === -3) return;
@@ -209,8 +210,7 @@ function Main() {
         ? intermediateText2
         : questions[step].question;
 
-    const textToSpeak =
-      step < 0 ? textToDisplay : speakTexts[step];
+    const textToSpeak = step < 0 ? textToDisplay : speakTexts[step];
 
     let index = 0;
     let interval;
@@ -288,7 +288,10 @@ function Main() {
   };
 
   const handleAnswer = () => {
-    if (step === 2) {
+    if (step === questions.length - 1) {
+      setIsFormVisible(true); // показать форму
+    } else if (step === 2) {
+      // "загрузка"
       setIsLoading(true);
       setShowAnswers(false);
       setTimeout(() => {
@@ -302,7 +305,9 @@ function Main() {
 
   return (
     <main className="main">
-      {step === -3 ? (
+      {isFormVisible ? (
+        <RegistrationForm />
+      ) : step === -3 ? (
         <div className="intro-screen">
           <h1 className="intro-title">{introText}</h1>
           <Button onClick={handleStart}>НАЧАТЬ</Button>

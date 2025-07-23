@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import questions from "./questions";
-import { intermediateText1, intermediateText2, introText } from "./Text";
+import { intermediateText1, introText } from "./Text";
 import AudioSphereVisualizer from "../AudioSphereVisualizer/AudioSphereVisualizer";
 import Button from "../Button/Button";
 import RegistrationForm from "../Form/RegistrationForm";
@@ -18,12 +18,8 @@ function Main() {
   const [typingStarted, setTypingStarted] = useState(false);
   const audioRef = useRef(null);
 
-  const textToDisplay =
-    step === -2
-      ? intermediateText1
-      : step === -1
-      ? intermediateText2
-      : questions[step]?.question || "";
+ const textToDisplay =
+  step === -2 ? intermediateText1 : questions[step]?.question || "";
 
   const [typedText, isTypingDone] = useTypedText(textToDisplay, 70, typingStarted);
 
@@ -78,19 +74,16 @@ function Main() {
 
   const handleStart = () => {
     setStep(-2);
-    const introAudio = new Audio(audioFiles[-2]);
-    introAudio.play();
+    // const introAudio = new Audio(audioFiles[-2]);
+    // introAudio.play();
     setTypingStarted(true);
   };
-
-  const handleIntermediateNext = () => {
-    setTypingStarted(false);
-    if (step === -2) {
-      setStep(-1);
-    } else if (step === -1) {
-      setStep(0);
-    }
-  };
+const handleIntermediateNext = () => {
+  setTypingStarted(false);
+  if (step === -2) {
+    setStep(0); // сразу к вопросам
+  }
+};
 
   const handleAnswer = () => {
     setTypingStarted(false);

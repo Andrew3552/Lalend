@@ -1,6 +1,5 @@
 export const audioFiles = {
   [-2]: "/audio/intermediateText1.mp3",
-  [-1]: "/audio/intermediateText2.mp3",
   0: "/audio/question1.mp3",
   1: "/audio/question2.mp3",
   2: "/audio/question3.mp3",

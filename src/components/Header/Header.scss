@@ -1,5 +1,15 @@
+.header {
+  background-color: #b0b0b0;
+  border-radius: 50px;
+  margin: 30px auto 0; // добавим auto по бокам для центрирования
+  padding: 10px;
+  width: fit-content; // подстраивается под содержимое (логотип)
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .logo{
     width: 300px;
     height: 60px;
-    margin-top: 30px;
 }

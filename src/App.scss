@@ -1,7 +1,6 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 /* Растягиваем всё на высоту экрана */
@@ -10,25 +9,11 @@ html, body, #root {
   padding: 0;
 }
 
-/* Основной контейнер приложения */
-.app-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-/* Центральная часть должна растягиваться */
-.app-wrapper > .main {
-  flex: 1;
-}
-
-
 *,
 *::before,
 *::after {
   box-sizing: border-box;
   margin: 0;
-  padding: 0;
 }
 a {
   text-decoration: none;

@@ -7,10 +7,10 @@ import useTypedText from "../../hooks/useTypedText";
 import "./RegistrationForm.scss";
 
 const introText =
-  "У меня для вас отличные новости! Вы можете начать зарабатывать уже сегодня, используя этого бота. Ваш предполагаемый ежедневный доход составит примерно тридцать пять тысяч тенге, и со временем эта сумма может стать ещё больше.";
+  "У меня для вас отличные новости! Вы можете начать зарабатывать уже сегодня, используя этого бота. Ваш предполагаемый ежедневный доход составит примерно 120 000 тенге, и со временем эта сумма может стать ещё больше.";
 
 export default function RegistrationFormSection() {
-  const [typedText, isTypingDone] = useTypedText(introText, 40);
+  const [typedText, isTypingDone] = useTypedText(introText, 70);
 
   const formik = useFormik({
     initialValues: {

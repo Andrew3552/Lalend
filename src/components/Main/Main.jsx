@@ -18,10 +18,14 @@ function Main() {
   const [typingStarted, setTypingStarted] = useState(false);
   const audioRef = useRef(null);
 
- const textToDisplay =
-  step === -2 ? intermediateText1 : questions[step]?.question || "";
+  const textToDisplay =
+    step === -2 ? intermediateText1 : questions[step]?.question || "";
 
-  const [typedText, isTypingDone] = useTypedText(textToDisplay, 70, typingStarted);
+  const [typedText, isTypingDone] = useTypedText(
+    textToDisplay,
+    70,
+    typingStarted
+  );
 
   useEffect(() => {
     if (step >= questions.length || step === -3) return;
@@ -78,12 +82,12 @@ function Main() {
     // introAudio.play();
     setTypingStarted(true);
   };
-const handleIntermediateNext = () => {
-  setTypingStarted(false);
-  if (step === -2) {
-    setStep(0); // сразу к вопросам
-  }
-};
+  const handleIntermediateNext = () => {
+    setTypingStarted(false);
+    if (step === -2) {
+      setStep(0); // сразу к вопросам
+    }
+  };
 
   const handleAnswer = () => {
     setTypingStarted(false);
@@ -103,40 +107,39 @@ const handleIntermediateNext = () => {
   };
 
   useEffect(() => {
-  if (!isFormVisible) return;
+    if (!isFormVisible) return;
 
-  const audio = new Audio("/audio/FinalText.mp3");
-  audioRef.current = audio;
+    const audio = new Audio("/audio/FinalText.mp3");
+    audioRef.current = audio;
 
-  audio.addEventListener("loadedmetadata", () => {
-    audio.play();
+    audio.addEventListener("loadedmetadata", () => {
+      audio.play();
 
-    const context = new AudioContext();
-    const source = context.createMediaElementSource(audio);
-    const analyser = context.createAnalyser();
-    source.connect(analyser);
-    analyser.connect(context.destination);
+      const context = new AudioContext();
+      const source = context.createMediaElementSource(audio);
+      const analyser = context.createAnalyser();
+      source.connect(analyser);
+      analyser.connect(context.destination);
 
-    analyser.fftSize = 256;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+      analyser.fftSize = 256;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
 
-    const updateVolume = () => {
-      analyser.getByteFrequencyData(dataArray);
-      const average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
-      setVolume(average);
-      requestAnimationFrame(updateVolume);
+      const updateVolume = () => {
+        analyser.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
+        setVolume(average);
+        requestAnimationFrame(updateVolume);
+      };
+
+      updateVolume();
+    });
+
+    return () => {
+      audio.pause();
+      audioRef.current = null;
     };
-
-    updateVolume();
-  });
-
-  return () => {
-    audio.pause();
-    audioRef.current = null;
-  };
-}, [isFormVisible]);
-
+  }, [isFormVisible]);
 
   return (
     <main className="main">
@@ -146,7 +149,11 @@ const handleIntermediateNext = () => {
         <RegistrationForm />
       ) : step === -3 ? (
         <div className="intro-screen">
-          <h1 className="intro-title">{introText}</h1>
+          <h1 className="intro-title">
+            {introText.split("\n").map((line, i) => (
+              <div key={i}>{line}</div>
+            ))}
+          </h1>
           <Button onClick={handleStart}>НАЧАТЬ</Button>
         </div>
       ) : (

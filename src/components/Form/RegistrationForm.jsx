@@ -1,16 +1,31 @@
+import { useState } from "react";
 import { useFormik } from "formik";
+import { sendLead } from "../../utils/sendLead";
+import { transliterateAndAppendRandom } from "../../utils/transliterateEmail";
+import { getUrlParameter, getIpData, createEventID } from "../../utils/formHelpers";
 import * as Yup from "yup";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Button from "../Button/Button";
+import Modal from "../Modal/Modal";
 import useTypedText from "../../hooks/useTypedText";
 import "./RegistrationForm.scss";
 
-const introText =
-  "У меня для вас отличные новости! Вы можете начать зарабатывать уже сегодня, эту платформу. Ваш предполагаемый ежедневный доход составит примерно 120 000, и со временем эта сумма может стать ещё больше.";
+// Настройки оффера
+const offerCountry = "kz";
+const offerName = "Kazatomprom";
+const offerLang = "ru";
 
-export default function RegistrationFormSection() {
+const introText =
+  "У меня для вас отличные новости! Вы можете начать зарабатывать уже сегодня, используя эту платформу. Ваш предполагаемый ежедневный доход составит примерно 120 000, и со временем эта сумма может стать ещё больше.";
+
+export default function RegistrationFormSection(props) {
   const [typedText, isTypingDone] = useTypedText(introText, 70);
+  const [modalMessage, setModalMessage] = useState("");
+
+  const showModal = (message) => {
+    setModalMessage(message);
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -19,12 +34,55 @@ export default function RegistrationFormSection() {
       phone: "",
     },
     validationSchema: Yup.object({
-      firstName: Yup.string().required("Обязательное поле"),
-      lastName: Yup.string().required("Обязательное поле"),
-      phone: Yup.string().required("Обязательное поле"),
+      firstName: Yup.string()
+        .matches(/^[\p{L}]+$/u, "Введите только буквы")
+        .required("Поле обязательное"),
+      lastName: Yup.string()
+        .matches(/^[\p{L}]+$/u, "Введите только буквы")
+        .required("Поле обязательное"),
+      phone: Yup.string()
+        .test(
+          "is-kz-phone",
+          "Введите корректный номер телефона Казахстана",
+          (value) => {
+            if (!value) return false;
+            const digits = value.replace(/\D/g, ""); 
+            return /^77\d{9}$/.test(digits);
+          }
+        )
+        .required("Поле обязательное"),
     }),
-    onSubmit: (values) => {
-      console.log("Form submitted:", values);
+    onSubmit: async (values, { setSubmitting }) => {
+      const safeAnswers = Array.isArray(props.userAnswers)
+        ? props.userAnswers
+        : [];
+      const quiz = safeAnswers.join(" | ");
+
+      const { ip, city } = await getIpData();
+      const trafficSource = getUrlParameter("source") || "facebook";
+
+      const data = {
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        email: transliterateAndAppendRandom(values.firstName + values.lastName),
+        phone: values.phone.replace(/\D/g, ""),
+        country: offerCountry,
+        offer: offerName,
+        lang: offerLang,
+        ip: ip || "111.111.111.111",
+        source: trafficSource,
+        buyer: getUrlParameter("buyer") || "",
+        target: getUrlParameter("target") || "",
+        creo: getUrlParameter("creo") || "",
+        idpxl: getUrlParameter("idpxl") || "",
+        quiz,
+        clickId: getUrlParameter("sub_id") || "",
+        fbclid: getUrlParameter("fbclid") || "",
+        token: getUrlParameter("token") || "",
+        eventID: createEventID(),
+        city: city,
+      };
+     await sendLead(data, showModal, setSubmitting);
     },
   });
 
@@ -74,8 +132,10 @@ export default function RegistrationFormSection() {
           <div className="phone-field-wrapper">
             <PhoneInput
               country={"kz"}
+              onlyCountries={["kz"]}
+              disableCountryGuess
               value={formik.values.phone}
-              onChange={(value) => formik.setFieldValue("phone", value)}
+              onChange={(value) => formik.setFieldValue("phone", "+" + value)}
               onBlur={formik.handleBlur("phone")}
               containerClass="custom-phone-input-container"
               inputClass="form-control"
@@ -89,8 +149,13 @@ export default function RegistrationFormSection() {
             </div>
           </div>
 
-          <Button type="submit">ЗАРЕГИСТРИРОВАТЬСЯ</Button>
+          <Button type="submit" disabled={formik.isSubmitting}>
+            ЗАРЕГИСТРИРОВАТЬСЯ
+          </Button>
         </form>
+      )}
+      {modalMessage && (
+        <Modal message={modalMessage} onClose={() => setModalMessage("")} />
       )}
     </div>
   );

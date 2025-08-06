@@ -10,12 +10,13 @@ import { audioFiles } from "../../../public/audio/audioFiles";
 import "./Main.scss";
 
 function Main() {
-  const [step, setStep] = useState(-3); // -3: старт, -2/-1: промежуточные, >=0: вопросы
+  const [step, setStep] = useState(-3); // -3: старт, -2: промежуточный, >=0: вопросы
   const [showAnswers, setShowAnswers] = useState(false);
   const [volume, setVolume] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [typingStarted, setTypingStarted] = useState(false);
+  const [userAnswers, setUserAnswers] = useState([]);
   const audioRef = useRef(null);
 
   const textToDisplay =
@@ -78,8 +79,6 @@ function Main() {
 
   const handleStart = () => {
     setStep(-2);
-    // const introAudio = new Audio(audioFiles[-2]);
-    // introAudio.play();
     setTypingStarted(true);
   };
   const handleIntermediateNext = () => {
@@ -89,27 +88,27 @@ function Main() {
     }
   };
 
-  const handleAnswer = () => {
-    setTypingStarted(false);
+ const handleAnswer = (answer) => {
+  setUserAnswers((prev) => [...prev, answer]);
 
-    if (step === questions.length - 1) {
-      setIsFormVisible(true);
-    } else if (step === 1) {
-      setIsLoading(true);
-      setShowAnswers(false);
-      setTimeout(() => {
-        setIsLoading(false);
-        setStep((prev) => prev + 1);
-      }, 3000);
-    } else {
+  if (step === questions.length - 1) {
+    setIsFormVisible(true);
+  } else if (step === 1) {
+    setIsLoading(true);
+    setShowAnswers(false);
+    setTimeout(() => {
+      setIsLoading(false);
       setStep((prev) => prev + 1);
-    }
-  };
+    }, 3000);
+  } else {
+    setStep((prev) => prev + 1);
+  }
+};
 
   useEffect(() => {
     if (!isFormVisible) return;
 
-    const audio = new Audio("/audio/FinalText.mp3");
+    const audio = new Audio("./audio/FinalText.mp3");
     audioRef.current = audio;
 
     audio.addEventListener("loadedmetadata", () => {
@@ -146,7 +145,7 @@ function Main() {
       <AudioSphereVisualizer audioLevel={volume} />
 
       {isFormVisible ? (
-        <RegistrationForm />
+        <RegistrationForm userAnswers={userAnswers} />
       ) : step === -3 ? (
         <div className="intro-screen">
           <h1 className="intro-title">
@@ -154,7 +153,7 @@ function Main() {
               <div key={i}>{line}</div>
             ))}
           </h1>
-          <Button onClick={handleStart}>НАЧАТЬ</Button>
+          <Button type="button" onClick={handleStart}>НАЧАТЬ</Button>
         </div>
       ) : (
         <>
@@ -162,7 +161,7 @@ function Main() {
             <h2>{typedText}</h2>
 
             {step < 0 && isTypingDone && (
-              <Button onClick={handleIntermediateNext}>Продолжить</Button>
+              <Button  onClick={handleIntermediateNext}>Продолжить</Button>
             )}
 
             {step >= 0 && (
@@ -173,7 +172,7 @@ function Main() {
                   showAnswers && (
                     <div className="answers">
                       {questions[step].answers.map((text, i) => (
-                        <Button key={i} onClick={handleAnswer}>
+                        <Button type="button" key={i} onClick={() => handleAnswer(text)}>
                           {text}
                         </Button>
                       ))}
